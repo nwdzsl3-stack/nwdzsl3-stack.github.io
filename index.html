@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人主页</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0a0a0f;
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  /* ===== 粒子背景 ===== */
+  #particles-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 30%, rgba(99,102,241,.25), transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    padding: .4rem 1.2rem;
+    border-radius: 100px;
+    background: rgba(99,102,241,.15);
+    border: 1px solid rgba(99,102,241,.3);
+    font-size: .85rem;
+    color: #a5b4fc;
+    letter-spacing: .05em;
+    margin-bottom: 1.5rem;
+    animation: fadeDown .8s ease;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.8rem, 8vw, 6rem);
+    font-weight: 900;
+    line-height: 1.05;
+    background: linear-gradient(135deg, #e0e7ff 0%, #818cf8 50%, #c084fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeUp .8s ease;
+  }
+
+  .hero .subtitle {
+    margin-top: 1.2rem;
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    font-weight: 300;
+    color: #94a3b8;
+    max-width: 600px;
+    animation: fadeUp .8s ease .15s both;
+  }
+
+  .hero .typing-wrap {
+    margin-top: 1rem;
+    height: 2rem;
+    font-size: 1rem;
+    color: #818cf8;
+    font-weight: 400;
+    animation: fadeUp .8s ease .3s both;
+  }
+
+  .hero .typing-wrap .cursor { animation: blink .8s infinite; }
+
+  .hero-cta {
+    margin-top: 2.5rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeUp .8s ease .45s both;
+  }
+
+  .btn {
+    padding: .8rem 2rem;
+    border-radius: 50px;
+    font-size: .95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all .3s ease;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    color: #fff;
+    box-shadow: 0 4px 25px rgba(99,102,241,.4);
+  }
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 35px rgba(99,102,241,.55);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: #c4b5fd;
+    border: 1px solid rgba(196,181,253,.3);
+  }
+  .btn-outline:hover {
+    background: rgba(196,181,253,.1);
+    border-color: #a78bfa;
+    transform: translateY(-3px);
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .3rem;
+    color: #64748b;
+    font-size: .75rem;
+    letter-spacing: .1em;
+    animation: bounce 2s infinite;
+  }
+  .scroll-hint .arrow { font-size: 1.2rem; }
+
+  /* ===== 通用 section ===== */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 6rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-title {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: .5rem;
+    background: linear-gradient(135deg, #e0e7ff, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .section-desc {
+    text-align: center;
+    color: #64748b;
+    max-width: 550px;
+    margin: 0 auto 4rem;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  /* ===== ABOUT ===== */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .about-avatar {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin: 0 auto;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid rgba(99,102,241,.3);
+    box-shadow: 0 0 60px rgba(99,102,241,.15);
+    background: linear-gradient(135deg, #1e1b4b, #0a0a0f);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .about-avatar .initials {
+    font-size: 5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #818cf8, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .about-avatar .ring {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    background: linear-gradient(135deg, #6366f1, #a855f7, #6366f1) border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: spin 6s linear infinite;
+  }
+
+  .about-text h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .about-text p {
+    color: #94a3b8;
+    line-height: 1.8;
+    margin-bottom: 1.2rem;
+    font-size: .95rem;
+  }
+
+  .about-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .about-stats .stat {
+    text-align: center;
+    padding: 1rem;
+    border-radius: 12px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.05);
+  }
+  .about-stats .stat .num {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #818cf8;
+  }
+  .about-stats .stat .label {
+    font-size: .75rem;
+    color: #64748b;
+    margin-top: .2rem;
+  }
+
+  /* ===== 技能时间线 ===== */
+  .timeline {
+    position: relative;
+    padding-left: 2.5rem;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #6366f1, #a855f7, transparent);
+  }
+
+  .tl-item {
+    position: relative;
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    border-radius: 16px;
+    background: rgba(255,255,255,.02);
+    border: 1px solid rgba(255,255,255,.05);
+    transition: all .3s ease;
+  }
+  .tl-item:hover {
+    background: rgba(255,255,255,.04);
+    border-color: rgba(99,102,241,.2);
+    transform: translateX(6px);
+  }
+
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -2.15rem;
+    top: 2rem;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border: 3px solid #0a0a0f;
+    box-shadow: 0 0 0 2px rgba(99,102,241,.3);
+  }
+
+  .tl-item .tag {
+    display: inline-block;
+    padding: .2rem .7rem;
+    border-radius: 6px;
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: .03em;
+    margin-bottom: .6rem;
+  }
+  .tag-blue { background: rgba(99,102,241,.15); color: #a5b4fc; }
+  .tag-purple { background: rgba(168,85,247,.15); color: #d8b4fe; }
+  .tag-cyan { background: rgba(6,182,212,.12); color: #67e8f9; }
+  .tag-emerald { background: rgba(52,211,153,.12); color: #6ee7b7; }
+  .tag-amber { background: rgba(251,191,36,.12); color: #fde68a; }
+
+  .tl-item h4 { font-size: 1.05rem; font-weight: 700; margin-bottom: .4rem; }
+  .tl-item p { font-size: .85rem; color: #94a3b8; line-height: 1.7; }
+
+  /* ===== 项目卡片 ===== */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .project-card {
+    border-radius: 20px;
+    padding: 2rem;
+    background: rgba(255,255,255,.02);
+    border: 1px solid rgba(255,255,255,.06);
+    transition: all .4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .4s ease;
+  }
+
+  .project-card:hover::before { transform: scaleX(1); }
+  .project-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(99,102,241,.2);
+    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+  }
+
+  .project-card .icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+  }
+
+  .project-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: .5rem; }
+  .project-card p { font-size: .85rem; color: #94a3b8; line-height: 1.7; }
+  .project-card .tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    margin-top: 1.2rem;
+  }
+  .project-card .tech span {
+    padding: .2rem .6rem;
+    border-radius: 6px;
+    background: rgba(255,255,255,.04);
+    font-size: .7rem;
+    color: #818cf8;
+    border: 1px solid rgba(99,102,241,.15);
+  }
+
+  /* ===== 联系 ===== */
+  .contact-section {
+    text-align: center;
+    padding-bottom: 4rem;
+  }
+
+  .contact-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+
+  .contact-links a {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    color: #94a3b8;
+    text-decoration: none;
+    padding: .7rem 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.06);
+    transition: all .3s ease;
+    font-size: .9rem;
+  }
+
+  .contact-links a:hover {
+    color: #e0e7ff;
+    border-color: rgba(99,102,241,.3);
+    background: rgba(99,102,241,.05);
+    transform: translateY(-3px);
+  }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 2rem;
+    color: #475569;
+    font-size: .8rem;
+    border-top: 1px solid rgba(255,255,255,.03);
+  }
+
+  /* ===== 动画 ===== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  /* ===== 滚动渐入 ===== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all .7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 768px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    .about-stats { grid-template-columns: repeat(3,1fr); }
+    .projects-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== 粒子画布 ===== -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-badge">✦ 持续探索 · 不断进化</div>
+  <h1>你好，我是<br/>你的名字</h1>
+  <p class="subtitle">
+    城市地下空间工程 · 用技术连接地面以下的世界
+  </p>
+  <div class="typing-wrap">
+    <span id="typing-text"></span><span class="cursor">|</span>
+  </div>
+  <div class="hero-cta">
+    <a href="#about" class="btn btn-primary">了解我 ▸</a>
+    <a href="#projects" class="btn btn-outline">查看项目</a>
+  </div>
+  <div class="scroll-hint">
+    SCROLL
+    <span class="arrow">⌄</span>
+  </div>
+</section>
+
+<!-- ===== ABOUT ===== -->
+<section id="about">
+  <h2 class="section-title reveal">关于我</h2>
+  <p class="section-desc reveal">
+    一个热衷于在看不见的地方创造价值的人
+  </p>
+
+  <div class="about-grid">
+    <div class="reveal">
+      <div class="about-avatar">
+        <div class="ring"></div>
+        <span class="initials">YM</span>
+      </div>
+    </div>
+
+    <div class="about-text reveal">
+      <h3>用工程思维塑造地下未来</h3>
+      <p>
+        我主修城市地下空间工程，专注于地下结构设计、岩土力学与数字化
+        建造技术的交叉领域。我相信城市的未来不仅在于天际线的高度，
+        更在于地表之下被忽视的深度。
+      </p>
+      <p>
+        从 BIM 协同设计到有限元分析，从 Python 自动化脚本到 AI 辅助工程决策，
+        我始终在寻找技术与人之间最优雅的结合点。
+      </p>
+      <div class="about-stats">
+        <div class="stat">
+          <div class="num">50+</div>
+          <div class="label">项目参与</div>
+        </div>
+        <div class="stat">
+          <div class="num">12+</div>
+          <div class="label">技术栈</div>
+        </div>
+        <div class="stat">
+          <div class="num">∞</div>
+          <div class="label">好奇心</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 技能 / 时间线 ===== -->
+<section id="skills">
+  <h2 class="section-title reveal">能力轨迹</h2>
+  <p class="section-desc reveal">
+    从理论到实践，一步步构建自己的技术版图
+  </p>
+
+  <div class="timeline reveal">
+    <div class="tl-item">
+      <span class="tag tag-blue">专业核心</span>
+      <h4>地下结构与岩土工程</h4>
+      <p>地下连续墙、基坑支护、隧道衬砌结构设计，掌握 MIDAS GTS、FLAC3D 等数值模拟工具。</p>
+    </div>
+    <div class="tl-item">
+      <span class="tag tag-purple">数字化建造</span>
+      <h4>BIM · 参数化设计</h4>
+      <p>Revit + Dynamo 参数化建模，Civil 3D 地质建模，用 Rhino + Grasshopper 做复杂曲面地下空间方案。</p>
+    </div>
+    <div class="tl-item">
+      <span class="tag tag-cyan">编程与自动化</span>
+      <h4>Python · JavaScript · AI</h4>
+      <p>用 Python 处理勘察数据、自动化报告生成；前端开发技能用于搭建工程可视化仪表盘。</p>
+    </div>
+    <div class="tl-item">
+      <span class="tag tag-emerald">数据分析</span>
+      <h4>工程监测 · 数据驱动决策</h4>
+      <p>深基坑监测数据分析，机器学习回归预测地表沉降，让数据为工程安全保驾护航。</p>
+    </div>
+    <div class="tl-item">
+      <span class="tag tag-amber">前沿探索</span>
+      <h4>AI Agent · 智能工程</h4>
+      <p>探索大语言模型在工程文档审查、规范检索、智能辅助设计中的应用场景。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 项目 ===== -->
+<section id="projects">
+  <h2 class="section-title reveal">代表项目</h2>
+  <p class="section-desc reveal">
+    每一行代码、每一张图纸，都是通往未来的一步
+  </p>
+
+  <div class="projects-grid">
+    <div class="project-card reveal">
+      <div class="icon">🏗️</div>
+      <h3>深基坑智能监测平台</h3>
+      <p>整合 IoT 传感器数据，实时可视化基坑变形趋势，结合 ML 模型提前预警风险，累计服务 3 个在建项目。</p>
+      <div class="tech">
+        <span>Python</span><span>Flask</span><span>ECharts</span><span>ML</span>
+      </div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="icon">🌐</div>
+      <h3>城市地下管网数字孪生</h3>
+      <p>基于 GIS + BIM 构建地下管网三维数字模型，实现管线碰撞检测与维护决策辅助，获院级优秀项目。</p>
+      <div class="tech">
+        <span>Revit</span><span>Dynamo</span><span>GIS</span><span>Three.js</span>
+      </div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="icon">🤖</div>
+      <h3>AI 辅助工程规范检索</h3>
+      <p>利用 RAG 技术构建工程规范知识库，支持自然语言查询，将 GB 规范检索时间从 30 分钟缩短到 30 秒。</p>
+      <div class="tech">
+        <span>LLM</span><span>RAG</span><span>Python</span><span>Vector DB</span>
+      </div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="icon">📊</div>
+      <h3>岩土参数智能推荐系统</h3>
+      <p>基于历史勘察数据训练回归模型，根据地层特征自动推荐岩土设计参数，误差控制在 15% 以内。</p>
+      <div class="tech">
+        <span>Scikit-learn</span><span>Pandas</span><span>SQLite</span><span>FastAPI</span>
+      </div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="icon">📐</div>
+      <h3>参数化隧道衬砌设计工具</h3>
+      <p>Grasshopper 参数化脚本，输入地质条件自动生成衬砌断面方案，设计效率提升 60%。</p>
+      <div class="tech">
+        <span>Rhino</span><span>Grasshopper</span><span>Python</span>
+      </div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="icon">🔬</div>
+      <h3>地下空间环境舒适度研究</h3>
+      <p>综合 CFD 模拟与实地测量，研究地下综合体的热湿环境与通风策略，发表论文 1 篇。</p>
+      <div class="tech">
+        <span>CFD</span><span>ANSYS</span><span>数据处理</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 联系 ===== -->
+<section class="contact-section" id="contact">
+  <h2 class="section-title reveal">建立连接</h2>
+  <p class="section-desc reveal" style="margin-bottom:0;">
+    如果你也对地下空间的未来感兴趣，欢迎联系我
+  </p>
+  <div class="contact-links reveal">
+    <a href="mailto:yourname@example.com">✉ yourname@example.com</a>
+    <a href="https://github.com" target="_blank">⌨ GitHub</a>
+    <a href="https://linkedin.com" target="_blank">🔗 LinkedIn</a>
+    <a href="#">📄 简历</a>
+  </div>
+</section>
+
+<footer>
+  © 2026 · 用好奇心挖掘深度
+</footer>
+
+<script>
+// ===== 粒子系统 =====
+const canvas = document.getElementById('particles-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = document.documentElement.scrollHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const particles = [];
+const COUNT = 80;
+const COLORS = ['99,102,241', '168,85,247', '6,182,212'];
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.size = Math.random() * 2 + 0.5;
+    this.speedX = (Math.random() - 0.5) * 0.4;
+    this.speedY = (Math.random() - 0.5) * 0.4;
+    this.opacity = Math.random() * 0.5 + 0.1;
+    this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+  }
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${this.color},${this.opacity})`;
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < COUNT; i++) particles.push(new Particle());
+
+let raf;
+function animateParticles() {
+  ctx.clearRect(0, 0, W, H);
+  for (const p of particles) { p.update(); p.draw(); }
+  // 连线
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 140) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(99,102,241,${0.06 * (1 - dist / 140)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+  raf = requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// 滚动时重置画布高度
+let resizeTimeout;
+window.addEventListener('scroll', () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(resize, 100);
+});
+
+// ===== 打字效果 =====
+const phrases = [
+  '城市地下空间工程 · 学生',
+  'BIM · 参数化设计 · 自动化',
+  '用代码连接工程与未来',
+  '保持好奇，挖掘深度'
+];
+let pi = 0, ci = 0, isDeleting = false;
+const el = document.getElementById('typing-text');
+
+function type() {
+  const full = phrases[pi];
+  if (isDeleting) {
+    el.textContent = full.substring(0, ci--);
+    if (ci < 0) {
+      isDeleting = false;
+      pi = (pi + 1) % phrases.length;
+      setTimeout(type, 400);
+      return;
+    }
+    setTimeout(type, 25);
+  } else {
+    el.textContent = full.substring(0, ci++);
+    if (ci > full.length) {
+      isDeleting = true;
+      setTimeout(type, 1600);
+      return;
+    }
+    setTimeout(type, 50);
+  }
+}
+type();
+
+// ===== 滚动渐入 =====
+const observer = new IntersectionObserver(entries => {
+  for (const e of entries) {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  }
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
