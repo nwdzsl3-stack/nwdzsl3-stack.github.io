@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交通数据分析与可视化课程报告</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #3B82F6;
+            --color-primary-dark: #1E40AF;
+            --color-primary-light: #60A5FA;
+            --color-accent: #F59E0B;
+            --color-accent-light: #FBBF24;
+            --color-success: #10B981;
+            --color-purple: #8B5CF6;
+            --bg-darkest: #030712;
+            --bg-dark: #0A0F1E;
+            --bg-card: rgba(15, 23, 42, 0.6);
+            --bg-glass: rgba(59, 130, 246, 0.08);
+            --bg-hover: rgba(59, 130, 246, 0.12);
+            --border-subtle: rgba(59, 130, 246, 0.15);
+            --border-active: rgba(59, 130, 246, 0.5);
+            --text-bright: #F8FAFC;
+            --text-main: #CBD5E1;
+            --text-muted: #94A3B8;
+            --text-dim: #64748B;
+            --glow-blue: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(59, 130, 246, 0.1);
+            --glow-accent: 0 0 15px rgba(245, 158, 11, 0.3);
+            --glow-purple: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Fira Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-darkest);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+        }
+
+        *:focus-visible { outline: 2px solid var(--color-primary-light); outline-offset: 2px; }
+
+        /* 侧边导航 */
+        .sidebar {
+            width: 300px;
+            background: linear-gradient(180deg, rgba(10, 15, 30, 0.98), rgba(3, 7, 18, 0.99));
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 16px;
+            z-index: 10;
+            backdrop-filter: blur(30px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 200px;
+            background: radial-gradient(ellipse at top left, rgba(59, 130, 246, 0.15), transparent 70%);
+            pointer-events: none;
+        }
+
+        .logo-area { padding: 20px 16px; position: relative; }
+
+        .logo-icon {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-purple));
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 12px;
+            box-shadow: var(--glow-blue);
+        }
+
+        .logo-icon svg { width: 24px; height: 24px; fill: white; }
+
+        .logo-text {
+            font-size: 18px; font-weight: 800; font-family: 'Inter', sans-serif;
+            color: var(--text-bright); letter-spacing: -0.5px;
+        }
+
+        .logo-sub { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+        .nav-section { margin-bottom: 4px; }
+
+        .nav-section-title {
+            font-size: 10px; font-weight: 600; color: var(--text-dim);
+            text-transform: uppercase; letter-spacing: 1.5px;
+            padding: 0 12px; margin-bottom: 6px;
+        }
+
+        .nav-links { list-style: none; padding: 0 8px; }
+
+        .nav-item {
+            padding: 10px 12px; margin-bottom: 2px; cursor: pointer;
+            border-radius: 10px; color: var(--text-muted);
+            font-size: 13px; font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 10px;
+            border: 1px solid transparent;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-hover); color: var(--text-bright);
+            border-color: var(--border-subtle);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.1));
+            border-color: var(--border-active);
+            color: var(--text-bright); font-weight: 600;
+            box-shadow: var(--glow-blue);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            width: 3px; height: 20px;
+            background: linear-gradient(180deg, var(--color-primary), var(--color-purple));
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nav-icon {
+            width: 32px; height: 32px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; background: var(--bg-glass);
+            transition: all 0.2s ease; flex-shrink: 0;
+        }
+
+        .nav-item.active .nav-icon {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .nav-num {
+            font-family: 'Fira Code', monospace; font-size: 10px;
+            color: var(--color-primary-light); opacity: 0.6;
+        }
+
+        .footer-area { padding: 16px 12px; }
+        .footer-note { font-size: 11px; color: var(--text-dim); text-align: center; }
+        .footer-note strong { color: var(--text-muted); font-weight: 600; }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1; position: relative; height: 100vh; overflow: hidden;
+        }
+
+        .main-content::before {
+            content: '';
+            position: absolute; top: -200px; right: -200px;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.08), transparent 70%);
+            pointer-events: none; z-index: 0;
+        }
+
+        .main-content::after {
+            content: '';
+            position: absolute; bottom: -300px; left: -100px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.06), transparent 70%);
+            pointer-events: none; z-index: 0;
+        }
+
+        .slide {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            padding: 40px 48px;
+            opacity: 0; pointer-events: none;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex; flex-direction: column; justify-content: flex-start;
+            z-index: 1;
+        }
+
+        .slide.active {
+            opacity: 1; pointer-events: auto; transform: translateY(0);
+        }
+
+        .slide-header { margin-bottom: 32px; position: relative; }
+
+        .header-top { display: flex; align-items: center; gap: 16px; margin-bottom: 10px; }
+
+        .badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 12px; border-radius: 8px;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            color: var(--color-primary-light);
+            font-family: 'Fira Code', monospace;
+            font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+        }
+
+        .badge-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--color-success);
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .slide-title {
+            font-size: 30px; font-weight: 800; color: var(--text-bright);
+            line-height: 1.2; letter-spacing: -0.5px;
+        }
+
+        .title-accent {
+            background: linear-gradient(135deg, var(--color-primary-light), var(--color-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-subtitle {
+            font-size: 14px; color: var(--text-muted); margin-top: 6px;
+        }
+
+        /* Glassmorphism 卡片 */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            backdrop-filter: blur(24px) saturate(1.3);
+            padding: 24px;
+            position: relative; overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.4), transparent);
+        }
+
+        .card:hover {
+            border-color: var(--border-active);
+            box-shadow: var(--glow-blue);
+            transform: translateY(-2px);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            height: calc(100% - 130px);
+            min-height: 0;
+        }
+
+        .grid-2-wide {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 24px;
+            height: calc(100% - 130px);
+            min-height: 0;
+        }
+
+        /* 代码预览区 */
+        .code-box {
+            background: rgba(3, 7, 18, 0.95);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            font-family: 'Fira Code', monospace;
+            padding: 24px; font-size: 13px;
+            color: var(--color-primary-light);
+            line-height: 1.8; white-space: pre-wrap;
+            height: 100%; overflow: auto;
+            position: relative;
+        }
+
+        .code-box::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 36px;
+            background: rgba(59, 130, 246, 0.05);
+            border-bottom: 1px solid var(--border-subtle);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .code-header {
+            position: absolute; top: 10px; left: 18px;
+            display: flex; gap: 7px;
+        }
+
+        .code-dot { width: 9px; height: 9px; border-radius: 50%; }
+
+        .code-lang {
+            position: absolute; top: 10px; right: 18px;
+            font-size: 10px; color: var(--text-dim); letter-spacing: 1px;
+        }
+
+        .code-content { margin-top: 18px; }
+
+        .keyword { color: #C084FC; }
+        .function { color: #60A5FA; }
+        .string { color: #34D399; }
+        .comment { color: #64748B; font-style: italic; }
+        .number { color: #F59E0B; }
+
+        /* 技术块 */
+        .tech-pill {
+            padding: 16px 20px; background: var(--bg-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px; margin-bottom: 10px;
+            cursor: pointer; transition: all 0.25s ease;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .tech-pill:hover {
+            background: var(--bg-hover); transform: translateX(6px);
+            border-color: var(--border-active);
+        }
+
+        .tech-pill.active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.1));
+            border-color: var(--color-primary); box-shadow: var(--glow-blue);
+        }
+
+        .tech-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; margin-right: 14px; flex-shrink: 0;
+        }
+
+        .tech-info { flex: 1; }
+
+        .tech-title { font-size: 14px; font-weight: 600; color: var(--text-bright); margin-bottom: 2px; }
+        .tech-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+        .click-indicator {
+            font-size: 11px; font-family: 'Fira Code', monospace;
+            color: var(--color-accent); opacity: 0;
+            transition: all 0.25s ease; transform: translateX(-8px);
+        }
+
+        .tech-pill:hover .click-indicator,
+        .tech-pill.active .click-indicator { opacity: 1; transform: translateX(0); }
+
+        /* 清洗管道 */
+        .pipeline-container { display: flex; flex-direction: column; gap: 10px; }
+
+        .pipe-node {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 18px; border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-glass); cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .pipe-node:hover { background: var(--bg-hover); border-color: var(--border-active); }
+
+        .pipe-node.active {
+            border-color: var(--color-primary);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.08));
+            box-shadow: var(--glow-blue);
+        }
+
+        .pipe-idx {
+            width: 32px; height: 32px; border-radius: 8px;
+            background: var(--bg-glass);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Fira Code', monospace; font-size: 13px; font-weight: 700;
+            color: var(--color-primary-light); flex-shrink: 0;
+        }
+
+        .pipe-node.active .pipe-idx {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .pipe-info { flex: 1; }
+        .pipe-name { font-weight: 600; color: var(--text-bright); font-size: 13px; margin-bottom: 2px; }
+        .pipe-desc { font-size: 11px; color: var(--text-muted); }
+
+        /* 数据面板 */
+        .data-panel {
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; position: relative;
+        }
+
+        .data-panel::before {
+            content: '';
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 280px; height: 280px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+
+        .status-bar {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 12px; color: var(--text-muted);
+            letter-spacing: 0.5px; margin-bottom: 16px;
+        }
+
+        .status-light {
+            width: 7px; height: 7px; background: var(--color-success); border-radius: 50%;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+            animation: pulse-dot 2s infinite;
+        }
+
+        .data-counter {
+            font-size: 52px; font-weight: 900; font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--text-bright), var(--color-primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 10px 0; letter-spacing: -2px;
+        }
+
+        .data-label { color: var(--text-muted); font-size: 13px; margin-bottom: 24px; }
+
+        .data-stats {
+            width: 85%; padding: 18px;
+            background: var(--bg-glass); border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .stat-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .stat-label { font-size: 12px; color: var(--text-muted); }
+
+        .stat-value {
+            font-family: 'Fira Code', monospace; font-size: 13px;
+            font-weight: 700; color: var(--color-accent);
+        }
+
+        .stat-desc {
+            font-size: 11px; color: var(--text-dim);
+            text-align: left; padding-top: 8px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .progress-bar {
+            width: 100%; height: 4px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 2px; overflow: hidden; margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-purple));
+            border-radius: 2px; transition: width 1s ease;
+        }
+
+        /* 图表区域 */
+        .viz-dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: calc(100% - 130px);
+            min-height: 0;
+        }
+
+        .viz-dashboard.triple {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .mock-chart {
+            background: var(--bg-card);
+            border-radius: 18px;
+            border: 1px solid var(--border-subtle);
+            padding: 24px;
+            display: flex; flex-direction: column;
+            position: relative;
+            backdrop-filter: blur(20px);
+        }
+
+        .chart-header {
+            font-size: 13px; color: var(--text-muted);
+            margin-bottom: 16px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .chart-title { font-weight: 600; color: var(--text-bright); }
+
+        .chart-body {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
+        }
+
+        .toggle-btn {
+            padding: 8px 14px; background: var(--bg-glass);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main); font-size: 12px; font-weight: 500;
+            border-radius: 8px; cursor: pointer; transition: all 0.25s ease;
+        }
+
+        .toggle-btn:hover {
+            background: var(--color-primary); color: white;
+            border-color: var(--color-primary); box-shadow: var(--glow-blue);
+        }
+
+        /* 封面页样式 */
+        .cover-container {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            height: 100%; text-align: center;
+            position: relative;
+        }
+
+        .cover-badge {
+            padding: 8px 20px; border-radius: 20px;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: var(--color-primary-light);
+            font-size: 13px; font-weight: 600;
+            margin-bottom: 28px;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+
+        .cover-title {
+            font-size: 38px; font-weight: 900; color: var(--text-bright);
+            line-height: 1.4; margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .cover-subtitle {
+            font-size: 18px; color: var(--text-muted);
+            margin-bottom: 32px; font-weight: 400;
+        }
+
+        .cover-meta {
+            display: flex; gap: 40px; justify-content: center; margin-top: 20px;
+        }
+
+        .cover-meta-item {
+            text-align: center;
+        }
+
+        .cover-meta-label {
+            font-size: 11px; color: var(--text-dim);
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .cover-meta-value {
+            font-size: 15px; color: var(--text-bright);
+            font-weight: 600;
+        }
+
+        /* 统计卡片网格 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 20px; text-align: center;
+            transition: all 0.25s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--border-active);
+            box-shadow: var(--glow-blue);
+            transform: translateY(-2px);
+        }
+
+        .stat-card-value {
+            font-size: 28px; font-weight: 900;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-bright);
+            margin-bottom: 4px;
+        }
+
+        .stat-card-label { font-size: 12px; color: var(--text-muted); }
+
+        .stat-card-sub { font-size: 10px; color: var(--text-dim); margin-top: 4px; }
+
+        /* 信息列表 */
+        .info-list { list-style: none; }
+        .info-list li {
+            padding: 10px 0; border-bottom: 1px solid var(--border-subtle);
+            font-size: 14px; color: var(--text-main);
+            display: flex; align-items: flex-start; gap: 10px;
+        }
+        .info-list li:last-child { border-bottom: none; }
+
+        .info-list .list-icon {
+            font-size: 16px; flex-shrink: 0; margin-top: 1px;
+        }
+
+        .info-list strong { color: var(--text-bright); }
+
+        /* 热力图模拟 */
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 3px;
+            width: 100%; height: 100%;
+            padding: 4px;
+        }
+
+        .heatmap-cell {
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; color: transparent;
+        }
+
+        .heatmap-cell:hover { color: white; font-weight: 700; transform: scale(1.15); z-index: 2; }
+
+        /* 总结页 */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            height: calc(100% - 130px);
+            min-height: 0;
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 28px;
+            display: flex; flex-direction: column;
+            align-items: center; text-align: center;
+        }
+
+        .summary-icon {
+            font-size: 40px; margin-bottom: 16px;
+        }
+
+        .summary-card h3 {
+            font-size: 16px; color: var(--text-bright);
+            margin-bottom: 12px; font-weight: 700;
+        }
+
+        .summary-card p {
+            font-size: 13px; color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .summary-card ul {
+            list-style: none; width: 100%; text-align: left;
+        }
+
+        .summary-card ul li {
+            font-size: 12px; color: var(--text-muted);
+            padding: 6px 0; border-bottom: 1px solid var(--border-subtle);
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* 异常类型标签 */
+        .anomaly-tags {
+            display: flex; flex-wrap: wrap; gap: 10px;
+        }
+
+        .anomaly-tag {
+            padding: 10px 16px; border-radius: 10px;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-glass);
+            font-size: 13px; color: var(--text-main);
+            cursor: pointer; transition: all 0.25s ease;
+        }
+
+        .anomaly-tag:hover, .anomaly-tag.active {
+            border-color: var(--color-primary);
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--text-bright);
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(59, 130, 246, 0.5); }
+
+        /* 交互动画 */
+        .cursor-glow {
+            position: fixed; width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15), transparent 70%);
+            border-radius: 50%; pointer-events: none; z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s ease; opacity: 0;
+        }
+        .cursor-glow.active { opacity: 1; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ripple {
+            position: absolute; border-radius: 50%;
+            background: rgba(59, 130, 246, 0.3);
+            transform: scale(0);
+            animation: ripple-effect 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-effect { to { transform: scale(4); opacity: 0; } }
+
+        .particle {
+            position: absolute; width: 4px; height: 4px;
+            background: var(--color-primary-light); border-radius: 50%;
+            pointer-events: none; opacity: 0;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { animation: none !important; transition-duration: 0.01ms !important; }
+            .cursor-glow { display: none; }
+        }
+
+        .text-red { color: #EF4444; }
+        .text-green { color: #34D399; }
+        .text-yellow { color: #FBBF24; }
+        .text-blue { color: #60A5FA; }
+    </style>
+</head>
+<body>
+
+    <!-- 侧边导航栏 -->
+    <div class="sidebar">
+        <div>
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13 10V3L4 14h7v7l9-11h-7z" fill="white"/>
+                    </svg>
+                </div>
+                <div class="logo-text">TRAFFIC DATA</div>
+                <div class="logo-sub">交通数据分析与可视化</div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">导航</div>
+                <ul class="nav-links">
+                    <li class="nav-item active" onclick="switchSlide(0)" tabindex="0" role="button">
+                        <div class="nav-icon">🏠</div>
+                        <div>
+                            <div>项目封面</div>
+                            <div class="nav-num">00 · Cover</div>
+                        </div>
+                    </li>
+                    <li class="nav-item" onclick="switchSlide(1)" tabindex="0" role="button">
+                        <div class="nav-icon">🧰</div>
+                        <div>
+                            <div>技术栈介绍</div>
+                            <div class="nav-num">01 · Tech Stack</div>
+                        </div>
+                    </li>
+                    <li class="nav-item" onclick="switchSlide(2)" tabindex="0" role="button">
+                        <div class="nav-icon">📂</div>
+                        <div>
+                            <div>数据来源与预处理</div>
+                            <div class="nav-num">02 · Data Preprocessing</div>
+                        </div>
+                    </li>
+                    <li class="nav-item" onclick="switchSlide(3)" tabindex="0" role="button">
+                        <div class="nav-icon">📊</div>
+                        <div>
+                            <div>交通流量时空分析</div>
+                            <div class="nav-num">03 · Spatiotemporal</div>
+                        </div>
+                    </li>
+                    <li class="nav-item" onclick="switchSlide(4)" tabindex="0" role="button">
+                        <div class="nav-icon">🚗</div>
+                        <div>
+                            <div>车型聚类分析</div>
+                            <div class="nav-num">04 · KMeans Clustering</div>
+                        </div>
+                    </li>
+                    <li class="nav-item" onclick="switchSlide(5)" tabindex="0" role="button">
+                        <div class="nav-icon">⚠️</div>
+                        <div>
+                            <div>车辆异常状态分析</div>
+                            <div class="nav-num">05 · Anomaly Detection</div>
+                        </div>
+                    </li>
+                    <li class="nav-item" onclick="switchSlide(6)" tabindex="0" role="button">
+                        <div class="nav-icon">✅</div>
+                        <div>
+                            <div>项目总结</div>
+                            <div class="nav-num">06 · Summary</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-area">
+            <div class="footer-note">
+                <strong>2026-03-14</strong> · 公路光纤传感数据<br>
+                <span style="font-size:10px;opacity:0.7;">Python全流程自动化分析</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+
+        <!-- SLIDE 0: 封面 -->
+        <div class="slide active" id="slide-0">
+            <div class="cover-container">
+                <div class="cover-badge">
+                    <span class="badge-dot"></span>
+                    课程项目 · 大数据分析与应用
+                </div>
+                <h1 class="cover-title">基于 Python 的全日交通数据<br>全流程处理、<span class="title-accent">多维统计与可视化分析</span></h1>
+                <p class="cover-subtitle">公路光纤传感数据分析（2026-03-14）</p>
+                <div style="font-size:15px;color:var(--text-muted);margin-bottom:12px;">
+                    数据读取 → 清洗 → 可视化 → 车型聚类 → 异常分析
+                </div>
+                <div class="cover-meta">
+                    <div class="cover-meta-item">
+                        <div class="cover-meta-label">原始数据量</div>
+                        <div class="cover-meta-value">12,615,035 条</div>
+                    </div>
+                    <div class="cover-meta-item">
+                        <div class="cover-meta-label">检测车辆数</div>
+                        <div class="cover-meta-value">13,147 辆</div>
+                    </div>
+                    <div class="cover-meta-item">
+                        <div class="cover-meta-label">分析维度</div>
+                        <div class="cover-meta-value">6 大模块</div>
+                    </div>
+                    <div class="cover-meta-item">
+                        <div class="cover-meta-label">技术栈</div>
+                        <div class="cover-meta-value">Python 全链路</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 1: 技术栈介绍 -->
+        <div class="slide" id="slide-1">
+            <div class="slide-header">
+                <div class="header-top">
+                    <span class="badge"><span class="badge-dot"></span>Tech Stack</span>
+                </div>
+                <h2 class="slide-title">🧰 一、Python 全链路<span class="title-accent">技术栈介绍</span></h2>
+                <p class="slide-subtitle">本项目采用 Python 生态完成从原始数据到可视化报告的全流程自动化分析</p>
+            </div>
+            <div class="grid-2-wide">
+                <div class="card" style="display:flex;flex-direction:column;gap:8px;">
+                    <p style="color:var(--text-muted);font-size:13px;margin-bottom:6px;">点击技术模块，查看调用代码：</p>
+                    <div class="tech-pill active" onclick="showCode('pandas')" tabindex="0" role="button">
+                        <div style="display:flex;align-items:center;">
+                            <div class="tech-icon" style="background:rgba(59,130,246,0.15);">🐼</div>
+                            <div class="tech-info">
+                                <div class="tech-title">Pandas & NumPy</div>
+                                <div class="tech-desc">数据读取、清洗、聚合统计，处理千万级CSV.BIN二进制数据</div>
+                            </div>
+                        </div>
+                        <span class="click-indicator">查看代码 →</span>
+                    </div>
+                    <div class="tech-pill" onclick="showCode('vis')" tabindex="0" role="button">
+                        <div style="display:flex;align-items:center;">
+                            <div class="tech-icon" style="background:rgba(139,92,246,0.15);">📈</div>
+                            <div class="tech-info">
+                                <div class="tech-title">Matplotlib & Seaborn</div>
+                                <div class="tech-desc">柱状、热力、轨迹、散点图——学术级可视化引擎</div>
+                            </div>
+                        </div>
+                        <span class="click-indicator">查看代码 →</span>
+                    </div>
+                    <div class="tech-pill" onclick="showCode('sklearn')" tabindex="0" role="button">
+                        <div style="display:flex;align-items:center;">
+                            <div class="tech-icon" style="background:rgba(16,185,129,0.15);">🤖</div>
+                            <div class="tech-info">
+                                <div class="tech-title">Scikit-learn</div>
+                                <div class="tech-desc">KMeans车型聚类（3类）、StandardScaler数据标准化</div>
+                            </div>
+                        </div>
+                        <span class="click-indicator">查看代码 →</span>
+                    </div>
+                    <div class="tech-pill" onclick="showCode('storage')" tabindex="0" role="button">
+                        <div style="display:flex;align-items:center;">
+                            <div class="tech-icon" style="background:rgba(245,158,11,0.15);">💾</div>
+                            <div class="tech-info">
+                                <div class="tech-title">Parquet & CSV.BIN</div>
+                                <div class="tech-desc">Parquet高速缓存减少80%运行时间，二进制存储节省85%空间</div>
+                            </div>
+                        </div>
+                        <span class="click-indicator">查看代码 →</span>
+                    </div>
+                    <p style="color:var(--color-accent);font-size:12px;margin-top:8px;font-weight:500;">⚡ 从原始数据到可视化，全流程自动化、可复用</p>
+                </div>
+                <div class="card" style="padding:0;overflow:hidden;">
+                    <div class="code-box" id="code-display-1">
+                        <div class="code-header">
+                            <div class="code-dot" style="background:#EF4444;"></div>
+                            <div class="code-dot" style="background:#F59E0B;"></div>
+                            <div class="code-dot" style="background:#10B981;"></div>
+                        </div>
+                        <div class="code-lang">PYTHON</div>
+                        <div class="code-content"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">import</span> seaborn <span class="keyword">as</span> sns
+<span class="keyword">from</span> sklearn.cluster <span class="keyword">import</span> KMeans
+<span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler
+
+<span class="comment"># 加载CSV.BIN光纤传感数据</span>
+df_raw = pd.<span class="function">read_csv</span>(<span class="string">'2026-03-14.csv.bin'</span>)
+
+<span class="comment"># 清洗后缓存为Parquet加速</span>
+df_clean.<span class="function">to_parquet</span>(<span class="string">'cleaned_data.parquet'</span>)
+
+<span class="comment"># KMeans车型聚类</span>
+kmeans = <span class="function">KMeans</span>(n_clusters=3, random_state=42)
+df[<span class="string">'cluster'</span>] = kmeans.<span class="function">fit_predict</span>(X_scaled)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: 数据来源与预处理 -->
+        <div class="slide" id="slide-2">
+            <div class="slide-header">
+                <div class="header-top">
+                    <span class="badge"><span class="badge-dot"></span>Data Preprocessing</span>
+                </div>
+                <h2 class="slide-title">📂 二、数据来源与<span class="title-accent">预处理流程</span></h2>
+                <p class="slide-subtitle">公路光纤传感设备 → CSV.BIN二进制文件 → 清洗过滤 → Parquet缓存</p>
+            </div>
+
+            <!-- 原始数据字段 -->
+            <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+                <span style="padding:6px 12px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:8px;font-size:12px;color:var(--text-muted);font-family:'Fira Code',monospace;">vehicleID</span>
+                <span style="padding:6px 12px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:8px;font-size:12px;color:var(--text-muted);font-family:'Fira Code',monospace;">speed</span>
+                <span style="padding:6px 12px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:8px;font-size:12px;color:var(--text-muted);font-family:'Fira Code',monospace;">startX / endX</span>
+                <span style="padding:6px 12px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:8px;font-size:12px;color:var(--text-muted);font-family:'Fira Code',monospace;">conf</span>
+                <span style="padding:6px 12px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:8px;font-size:12px;color:var(--text-muted);font-family:'Fira Code',monospace;">diffDistance</span>
+                <span style="padding:6px 12px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:8px;font-size:12px;color:var(--text-muted);font-family:'Fira Code',monospace;">width / amp</span>
+                <span style="padding:6px 12px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:8px;font-size:12px;color:var(--text-muted);font-family:'Fira Code',monospace;">extendedTagList</span>
+            </div>
+
+            <div class="grid-2">
+                <div class="card pipeline-container">
+                    <p style="color:var(--text-muted);font-size:13px;margin-bottom:6px;">点击清洗节点，观察数据变化：</p>
+                    <div class="pipe-node active" onclick="updateDataVolume(12615035, '0.00%', '原始CSV.BIN光纤传感数据', this)" tabindex="0" role="button">
+                        <div class="pipe-idx">1</div>
+                        <div class="pipe-info">
+                            <div class="pipe-name">加载原始数据</div>
+                            <div class="pipe-desc">读取 2026-03-14 全天 .csv.bin 二进制文件，含完整光纤信号特征</div>
+                        </div>
+                    </div>
+                    <div class="pipe-node" onclick="updateDataVolume(12615035, '0.00%', '筛选2026-03-14全天数据', this)" tabindex="0" role="button">
+                        <div class="pipe-idx">2</div>
+                        <div class="pipe-info">
+                            <div class="pipe-name">日期筛选 & 去重</div>
+                            <div class="pipe-desc">筛选目标日期、删除重复记录、剔除空值行</div>
+                        </div>
+                    </div>
+                    <div class="pipe-node" onclick="updateDataVolume(8977949, '28.83%', 'conf≥0.85，保留71.17%高质量数据', this)" tabindex="0" role="button">
+                        <div class="pipe-idx">3</div>
+                        <div class="pipe-info">
+                            <div class="pipe-name">置信度过滤 & 速度过滤</div>
+                            <div class="pipe-desc">conf ≥ 0.85 + 速度区间0–120 m/s 异常剔除</div>
+                        </div>
+                    </div>
+                    <div class="pipe-node" onclick="updateDataVolume(8977949, '28.83%', '清洗后保存为.parquet，下次秒加载', this)" tabindex="0" role="button">
+                        <div class="pipe-idx">4</div>
+                        <div class="pipe-info">
+                            <div class="pipe-name">缓存保存</div>
+                            <div class="pipe-desc">自动保存为 cleaned_data.parquet，减少80%后续加载时间</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card data-panel">
+                    <div class="status-bar">
+                        <span class="status-light"></span>
+                        数据流状态监控
+                    </div>
+                    <div class="data-counter" id="volume-num">12,615,035</div>
+                    <div class="data-label">记录条数</div>
+                    <div class="data-stats">
+                        <div class="stat-row">
+                            <span class="stat-label">总清洗流失率</span>
+                            <span class="stat-value" id="drop-rate">0.00%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill" style="width:100%;"></div>
+                        </div>
+                        <div class="stat-desc" id="pipe-desc">原始CSV.BIN光纤传感数据</div>
+                        <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:11px;color:var(--text-dim);">
+                            <span>原始车辆: <strong style="color:var(--text-bright);">13,147</strong></span>
+                            <span>清洗后: <strong style="color:var(--color-success);">13,065</strong></span>
+                            <span>保留率: <strong style="color:var(--color-accent);">99.4%</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: 交通流量时空分析 -->
+        <div class="slide" id="slide-3">
+            <div class="slide-header">
+                <div class="header-top">
+                    <span class="badge"><span class="badge-dot"></span>Spatiotemporal Analysis</span>
+                </div>
+                <h2 class="slide-title">📊 三、交通流量<span class="title-accent">时空分析</span></h2>
+                <p class="slide-subtitle">每小时车辆数量时序分布 · 各时段平均速度热力图 · 延伸数据（标签0）分布</p>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-value">1,020</div>
+                    <div class="stat-card-label">晚高峰峰值（18点）</div>
+                    <div class="stat-card-sub">全天最高</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value">640</div>
+                    <div class="stat-card-label">早高峰峰值（8点）</div>
+                    <div class="stat-card-sub">次高峰</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value">~20</div>
+                    <div class="stat-card-label">凌晨最低（0–5点）</div>
+                    <div class="stat-card-sub">道路畅通</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value">27 m/s</div>
+                    <div class="stat-card-label">凌晨最高速度</div>
+                    <div class="stat-card-sub">vs 晚高峰 22–24 m/s</div>
+                </div>
+            </div>
+
+            <div class="viz-dashboard">
+                <!-- 每小时车辆数量柱状图 -->
+                <div class="mock-chart">
+                    <div class="chart-header">
+                        <span class="chart-title">每小时车辆数量（时序分布）</span>
+                        <button class="toggle-btn" onclick="randomizeBars()">模拟刷新</button>
+                    </div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">凌晨低谷 → 早高峰 → 午后平稳 → <span style="color:#FBBF24;">晚高峰最高</span></div>
+                    <div class="chart-body">
+                        <div style="width:100%;height:100%;display:flex;align-items:flex-end;gap:3px;padding:0 4px;" id="hour-bar-container"></div>
+                    </div>
+                </div>
+
+                <!-- 各时段平均速度热力图 -->
+                <div class="mock-chart">
+                    <div class="chart-header">
+                        <span class="chart-title">各时段平均速度热力图</span>
+                    </div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">
+                        凌晨<span class="text-green">高速度</span> → 早晚高峰<span class="text-red">低速度</span> → 车速越低越拥堵
+                    </div>
+                    <div class="chart-body">
+                        <div class="heatmap-grid" id="heatmap-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 延伸数据说明 -->
+            <div style="margin-top:16px;padding:14px 20px;background:var(--bg-glass);border:1px solid var(--border-subtle);border-radius:12px;display:flex;align-items:center;gap:16px;">
+                <span style="font-size:20px;">🔬</span>
+                <div>
+                    <strong style="color:var(--text-bright);">延伸数据（extendedTagList = 0）</strong>
+                    <span style="color:var(--text-muted);font-size:13px;">— 拥堵导致信号重叠。凌晨占比低，晚高峰（17–18点）暴增。车多+车速低 → 延伸数据显著增多，完全符合光纤传感原理。</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: 车型聚类分析 -->
+        <div class="slide" id="slide-4">
+            <div class="slide-header">
+                <div class="header-top">
+                    <span class="badge"><span class="badge-dot"></span>KMeans Clustering</span>
+                </div>
+                <h2 class="slide-title">🚗 四、车型<span class="title-accent">聚类分析</span>（KMeans）</h2>
+                <p class="slide-subtitle">聚类特征：width（信号宽度）+ amp（信号强度）→ 3类车型划分</p>
+            </div>
+
+            <div class="viz-dashboard">
+                <!-- 聚类结果 -->
+                <div class="mock-chart">
+                    <div class="chart-header">
+                        <span class="chart-title">KMeans 三分类结果</span>
+                    </div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">基于 width + amp 特征的3类聚类</div>
+                    <div class="chart-body" style="flex-direction:column;gap:20px;">
+                        <div style="display:flex;gap:16px;width:100%;justify-content:center;">
+                            <div style="flex:1;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);border-radius:14px;padding:20px;text-align:center;">
+                                <div style="font-size:32px;font-weight:900;color:#34D399;">5,200</div>
+                                <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">小型车</div>
+                                <div style="font-size:10px;color:var(--text-dim);">width / amp 小</div>
+                            </div>
+                            <div style="flex:1;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);border-radius:14px;padding:20px;text-align:center;">
+                                <div style="font-size:32px;font-weight:900;color:#60A5FA;">4,600</div>
+                                <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">中型车</div>
+                                <div style="font-size:10px;color:var(--text-dim);">width / amp 中等</div>
+                            </div>
+                            <div style="flex:1;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);border-radius:14px;padding:20px;text-align:center;">
+                                <div style="font-size:32px;font-weight:900;color:#FBBF24;">3,300</div>
+                                <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">大型车</div>
+                                <div style="font-size:10px;color:var(--text-dim);">width / amp 大</div>
+                            </div>
+                        </div>
+                        <div style="width:100%;height:40px;display:flex;border-radius:8px;overflow:hidden;">
+                            <div style="width:39.5%;background:linear-gradient(90deg,#34D399,#34D399);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">39.5%</div>
+                            <div style="width:35.0%;background:linear-gradient(90deg,#60A5FA,#60A5FA);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">35.0%</div>
+                            <div style="width:25.5%;background:linear-gradient(90deg,#FBBF24,#FBBF24);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">25.5%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 相关性矩阵 -->
+                <div class="mock-chart">
+                    <div class="chart-header">
+                        <span class="chart-title">特征相关性验证</span>
+                    </div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">关键变量间 Pearson 相关系数</div>
+                    <div class="chart-body" style="flex-direction:column;gap:14px;">
+                        <div style="width:100%;padding:16px;background:var(--bg-glass);border-radius:10px;border:1px solid var(--border-subtle);">
+                            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                                <span style="font-size:13px;color:var(--text-bright);">width ↔ amp</span>
+                                <span style="font-size:16px;font-weight:800;color:#34D399;">0.53</span>
+                            </div>
+                            <div style="height:6px;background:rgba(16,185,129,0.15);border-radius:3px;overflow:hidden;">
+                                <div style="height:100%;width:53%;background:#34D399;border-radius:3px;"></div>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-dim);margin-top:6px;">中等正相关 → 车型特征有效</div>
+                        </div>
+                        <div style="width:100%;padding:16px;background:var(--bg-glass);border-radius:10px;border:1px solid var(--border-subtle);">
+                            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                                <span style="font-size:13px;color:var(--text-bright);">speed ↔ amp</span>
+                                <span style="font-size:16px;font-weight:800;color:#F59E0B;">-0.37</span>
+                            </div>
+                            <div style="height:6px;background:rgba(245,158,11,0.15);border-radius:3px;overflow:hidden;">
+                                <div style="height:100%;width:37%;background:#F59E0B;border-radius:3px;"></div>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-dim);margin-top:6px;">负相关 → 车速越快信号越弱</div>
+                        </div>
+                        <div style="width:100%;padding:16px;background:var(--bg-glass);border-radius:10px;border:1px solid var(--border-subtle);">
+                            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                                <span style="font-size:13px;color:var(--text-bright);">标签0 ↔ speed</span>
+                                <span style="font-size:16px;font-weight:800;color:#EF4444;">负相关</span>
+                            </div>
+                            <div style="height:6px;background:rgba(239,68,68,0.15);border-radius:3px;overflow:hidden;">
+                                <div style="height:100%;width:42%;background:#EF4444;border-radius:3px;"></div>
+                            </div>
+                            <div style="font-size:11px;color:var(--text-dim);margin-top:6px;">拥堵易产生延伸数据</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: 车辆异常状态分析 -->
+        <div class="slide" id="slide-5">
+            <div class="slide-header">
+                <div class="header-top">
+                    <span class="badge"><span class="badge-dot"></span>Anomaly Detection</span>
+                </div>
+                <h2 class="slide-title">⚠️ 五、车辆<span class="title-accent">异常状态分析</span></h2>
+                <p class="slide-subtitle">五种异常类型识别 · 整体异常率约22% · 高峰时段异常集中</p>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3 style="color:var(--text-bright);font-size:15px;margin-bottom:16px;">异常类型定义</h3>
+                    <div class="anomaly-tags" style="flex-direction:column;gap:6px;">
+                        <div class="anomaly-tag" style="display:flex;justify-content:space-between;cursor:default;">
+                            <span>🔴 延伸异常（标签0）</span>
+                            <span style="color:var(--text-dim);font-size:11px;">拥堵导致信号重叠</span>
+                        </div>
+                        <div class="anomaly-tag" style="display:flex;justify-content:space-between;cursor:default;">
+                            <span>🟡 低置信度异常</span>
+                            <span style="color:var(--text-dim);font-size:11px;">conf &lt; 0.85</span>
+                        </div>
+                        <div class="anomaly-tag" style="display:flex;justify-content:space-between;cursor:default;">
+                            <span>🟠 超速异常</span>
+                            <span style="color:var(--text-dim);font-size:11px;">speed &gt; 60 m/s</span>
+                        </div>
+                        <div class="anomaly-tag" style="display:flex;justify-content:space-between;cursor:default;">
+                            <span>🔵 低速异常</span>
+                            <span style="color:var(--text-dim);font-size:11px;">speed &lt; 10（疑似停车）</span>
+                        </div>
+                        <div class="anomaly-tag" style="display:flex;justify-content:space-between;cursor:default;">
+                            <span>🟣 信号异常</span>
+                            <span style="color:var(--text-dim);font-size:11px;">width/amp 偏离 3σ 范围</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card data-panel">
+                    <div class="status-bar">
+                        <span class="status-light" style="background:#F59E0B;box-shadow:0 0 12px rgba(245,158,11,0.6);"></span>
+                        异常统计概览
+                    </div>
+                    <div class="data-counter" style="font-size:44px;background:linear-gradient(135deg,#FBBF24,#EF4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">22%</div>
+                    <div class="data-label">整体异常率</div>
+                    <div class="data-stats">
+                        <div style="display:flex;gap:12px;margin-bottom:12px;">
+                            <div style="flex:1;text-align:center;">
+                                <div style="font-size:20px;font-weight:800;color:#EF4444;">↗</div>
+                                <div style="font-size:10px;color:var(--text-dim);">高峰时段异常率</div>
+                                <div style="font-size:12px;color:var(--text-bright);font-weight:600;">最高</div>
+                            </div>
+                            <div style="flex:1;text-align:center;">
+                                <div style="font-size:20px;font-weight:800;color:#34D399;">↘</div>
+                                <div style="font-size:10px;color:var(--text-dim);">凌晨时段异常率</div>
+                                <div style="font-size:12px;color:var(--text-bright);font-weight:600;">最低</div>
+                            </div>
+                            <div style="flex:1;text-align:center;">
+                                <div style="font-size:20px;font-weight:800;color:#F59E0B;">🚛</div>
+                                <div style="font-size:10px;color:var(--text-dim);">大型车异常率</div>
+                                <div style="font-size:12px;color:var(--text-bright);font-weight:600;">高于小型车</div>
+                            </div>
+                        </div>
+                        <div class="stat-desc" style="text-align:center;">
+                            核心发现：<strong style="color:var(--text-bright);">拥堵是异常主要诱因</strong>，延伸信号占比最高
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 各时段异常率柱状图 -->
+            <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px;height:calc(100% - 390px);min-height:0;">
+                <div class="mock-chart">
+                    <div class="chart-header">
+                        <span class="chart-title">各时段异常率变化</span>
+                    </div>
+                    <div class="chart-body">
+                        <div style="width:100%;height:100%;display:flex;align-items:flex-end;gap:3px;padding:0 4px;" id="anomaly-bar-container"></div>
+                    </div>
+                </div>
+                <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:18px;padding:20px;">
+                    <ul class="info-list">
+                        <li><span class="list-icon">📌</span> <div><strong>延伸异常</strong>集中在晚高峰（17–18点），与交通流量峰值完全重合</div></li>
+                        <li><span class="list-icon">📌</span> <div><strong>低置信度</strong>数据分散在全天，与传感器瞬时干扰有关</div></li>
+                        <li><span class="list-icon">📌</span> <div><strong>大型车</strong>由于信号宽度和强度较大，更容易触发信号异常检测</div></li>
+                        <li><span class="list-icon">📌</span> <div><strong>超速/低速</strong>异常占比极低（<2%），数据整体质量可靠</div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: 项目总结 -->
+        <div class="slide" id="slide-6">
+            <div class="slide-header">
+                <div class="header-top">
+                    <span class="badge"><span class="badge-dot"></span>Summary & Output</span>
+                </div>
+                <h2 class="slide-title">✅ 六、项目总结与<span class="title-accent">输出文件清单</span></h2>
+                <p class="slide-subtitle">核心结论 · 项目价值 · 完整输出文件</p>
+            </div>
+
+            <div class="summary-grid">
+                <!-- 核心结论 -->
+                <div class="summary-card">
+                    <div class="summary-icon">📋</div>
+                    <h3>核心结论</h3>
+                    <ul>
+                        <li>🚗 晚高峰18点拥堵最严重（1020辆）</li>
+                        <li>🌙 凌晨0-5点道路畅通（~20辆）</li>
+                        <li>📊 车速↓→流量↑→延伸数据↑</li>
+                        <li>🚛 小型车为主（39.5%），分布合理</li>
+                        <li>⚠️ 异常率约22%，高峰集中</li>
+                        <li>🔬 光纤传感特征与交通状态强相关</li>
+                    </ul>
+                </div>
+
+                <!-- 项目价值 -->
+                <div class="summary-card">
+                    <div class="summary-icon">💡</div>
+                    <h3>项目价值</h3>
+                    <ul>
+                        <li>实现光纤传感数据全链路自动化</li>
+                        <li>Parquet缓存加速 80%</li>
+                        <li>CSV.BIN节省 85% 存储</li>
+                        <li>可用于道路拥堵实时监测</li>
+                        <li>车型自动分类统计</li>
+                        <li>异常状态智能识别</li>
+                        <li>代码高度可复用</li>
+                        <li>可视化直观可交互</li>
+                    </ul>
+                </div>
+
+                <!-- 输出文件清单 -->
+                <div class="summary-card">
+                    <div class="summary-icon">📁</div>
+                    <h3>输出文件清单</h3>
+                    <ul>
+                        <li>📄 cleaned_data.parquet</li>
+                        <li style="color:var(--text-dim);">清洗后数据</li>
+                        <li>📄 hourly_vehicle_count.csv</li>
+                        <li style="color:var(--text-dim);">小时流量统计</li>
+                        <li>📄 correlation_matrix.csv</li>
+                        <li style="color:var(--text-dim);">相关性矩阵</li>
+                        <li>📄 cluster_results.csv</li>
+                        <li style="color:var(--text-dim);">聚类结果</li>
+                        <li>📊 flow_speed_heatmap.png</li>
+                        <li style="color:var(--text-dim);">速度热力图</li>
+                        <li>📊 kmeans_scatter.png</li>
+                        <li style="color:var(--text-dim);">聚类散点图</li>
+                        <li>📊 anomaly_report.png</li>
+                        <li style="color:var(--text-dim);">异常分析图</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 鼠标跟随光效 -->
+    <div class="cursor-glow" id="cursor-glow"></div>
+
+    <script>
+        // ===== 交互动画系统 =====
+
+        // 1. 鼠标跟随光效
+        const cursorGlow = document.getElementById('cursor-glow');
+        let mouseX = 0, mouseY = 0;
+        let glowX = 0, glowY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursorGlow.classList.add('active');
+        });
+
+        document.addEventListener('mouseleave', () => {
+            cursorGlow.classList.remove('active');
+        });
+
+        function animateCursorGlow() {
+            glowX += (mouseX - glowX) * 0.1;
+            glowY += (mouseY - glowY) * 0.1;
+            cursorGlow.style.left = glowX + 'px';
+            cursorGlow.style.top = glowY + 'px';
+            requestAnimationFrame(animateCursorGlow);
+        }
+        animateCursorGlow();
+
+        // 2. 卡片倾斜效果
+        function addTiltEffect(selector) {
+            document.querySelectorAll(selector).forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = (y - centerY) / 10;
+                    const rotateY = (centerX - x) / 10;
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02,1.02,1.02)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1,1,1)';
+                });
+            });
+        }
+
+        // 3. 涟漪效果
+        function addRippleEffect(selector) {
+            document.querySelectorAll(selector).forEach(el => {
+                el.addEventListener('click', function(e) {
+                    const ripple = document.createElement('span');
+                    ripple.className = 'ripple';
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                    ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+                    this.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
+        }
+
+        // 4. 入场动画
+        function animateSlideIn(index) {
+            const slide = document.getElementById(`slide-${index}`);
+            const elements = slide.querySelectorAll('.card, .tech-pill, .pipe-node, .mock-chart, .stat-card, .summary-card, .anomaly-tag');
+            elements.forEach((el, i) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                setTimeout(() => {
+                    el.style.transition = 'all 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, 80 + i * 80);
+            });
+        }
+
+        // ===== 幻灯片切换 =====
+        function switchSlide(index) {
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            const slide = document.getElementById(`slide-${index}`);
+            const navItem = document.querySelectorAll('.nav-item')[index];
+
+            slide.classList.add('active');
+            navItem.classList.add('active');
+
+            animateSlideIn(index);
+
+            // 第2页：数字动画
+            if (index === 2) {
+                setTimeout(() => {
+                    animateCounter(document.getElementById('volume-num'), 12615035, 1500);
+                }, 400);
+            }
+
+            // 第3页：初始化柱状图和热力图
+            if (index === 3) {
+                setTimeout(initHourBars, 400);
+                setTimeout(initHeatmap, 400);
+            }
+
+            // 第5页：初始化异常率柱状图
+            if (index === 5) {
+                setTimeout(initAnomalyBars, 400);
+            }
+        }
+
+        // 键盘导航
+        document.querySelectorAll('.nav-item, .tech-pill, .pipe-node').forEach(el => {
+            el.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault(); el.click();
+                }
+            });
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            addTiltEffect('.card, .tech-pill, .pipe-node, .stat-card');
+            addRippleEffect('.tech-pill, .pipe-node, .toggle-btn');
+            animateSlideIn(0);
+        });
+
+        // 数字滚动动画
+        function animateCounter(element, target, duration = 1500) {
+            const start = 0;
+            const startTime = performance.now();
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const current = Math.floor(start + (target - start) * easeOut);
+                element.textContent = current.toLocaleString();
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        // ===== SLIDE 1: 代码切换 =====
+        const codeRepo = {
+            pandas: `<div class="code-header"><div class="code-dot" style="background:#EF4444;"></div><div class="code-dot" style="background:#F59E0B;"></div><div class="code-dot" style="background:#10B981;"></div></div><div class="code-lang">PYTHON</div><div class="code-content"><span class="comment"># 加载CSV.BIN光纤传感数据</span>\ndf_raw = pd.<span class="function">read_csv</span>(<span class="string">'2026-03-14.csv.bin'</span>)\n\n<span class="comment"># 筛选目标日期</span>\ndf = df_raw[df_raw[<span class="string">'date'</span>] == <span class="string">'2026-03-14'</span>]\n\n<span class="comment"># 置信度过滤</span>\ndf_clean = df[df[<span class="string">'conf'</span>] >= <span class="number">0.85</span>]\n\n<span class="comment"># 速度异常过滤</span>\ndf_clean = df_clean[(df_clean[<span class="string">'speed'</span>] >= <span class="number">0</span>) & (df_clean[<span class="string">'speed'</span>] <= <span class="number">120</span>)]</div>`,
+            vis: `<div class="code-header"><div class="code-dot" style="background:#EF4444;"></div><div class="code-dot" style="background:#F59E0B;"></div><div class="code-dot" style="background:#10B981;"></div></div><div class="code-lang">PYTHON</div><div class="code-content"><span class="comment"># 每小时车辆数量柱状图</span>\nfig, ax = plt.<span class="function">subplots</span>(figsize=(14, 6))\nax.<span class="function">bar</span>(hours, vehicle_counts, color=<span class="string">'#3B82F6'</span>)\nax.<span class="function">axhline</span>(y=500, color=<span class="string">'red'</span>, ls=<span class="string">'--'</span>, label=<span class="string">'平均线'</span>)\n\n<span class="comment"># 速度热力图</span>\nsns.<span class="function">heatmap</span>(speed_matrix, cmap=<span class="string">'RdYlGn'</span>, annot=<span class="keyword">True</span>)</div>`,
+            sklearn: `<div class="code-header"><div class="code-dot" style="background:#EF4444;"></div><div class="code-dot" style="background:#F59E0B;"></div><div class="code-dot" style="background:#10B981;"></div></div><div class="code-lang">PYTHON</div><div class="code-content"><span class="comment"># KMeans车型聚类</span>\n<span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler\n<span class="keyword">from</span> sklearn.cluster <span class="keyword">import</span> KMeans\n\nfeatures = [<span class="string">'width'</span>, <span class="string">'amp'</span>]\nX = df_clean[features]\nX_scaled = <span class="function">StandardScaler</span>().<span class="function">fit_transform</span>(X)\n\nkmeans = <span class="function">KMeans</span>(n_clusters=3, random_state=42)\ndf_clean[<span class="string">'vehicle_type'</span>] = kmeans.<span class="function">fit_predict</span>(X_scaled)</div>`,
+            storage: `<div class="code-header"><div class="code-dot" style="background:#EF4444;"></div><div class="code-dot" style="background:#F59E0B;"></div><div class="code-dot" style="background:#10B981;"></div></div><div class="code-lang">PYTHON</div><div class="code-content"><span class="comment"># Parquet高速缓存 — 减少80%加载时间</span>\ndf_clean.<span class="function">to_parquet</span>(<span class="string">'cleaned_data.parquet'</span>)\ndf = pd.<span class="function">read_parquet</span>(<span class="string">'cleaned_data.parquet'</span>)  <span class="comment"># 秒加载</span>\n\n<span class="comment"># CSV.BIN二进制存储 — 节省85%空间</span>\ndf.<span class="function">to_csv</span>(<span class="string">'output.csv.bin'</span>, index=<span class="keyword">False</span>)\n\n<span class="comment"># 输出文件清单</span>\ndf_hourly.<span class="function">to_csv</span>(<span class="string">'hourly_vehicle_count.csv'</span>)\ncorr_matrix.<span class="function">to_csv</span>(<span class="string">'correlation_matrix.csv'</span>)</div>`
+        };
+
+        function showCode(key) {
+            const pills = document.querySelectorAll('#slide-1 .tech-pill');
+            pills.forEach(p => p.classList.remove('active'));
+            if (key === 'pandas') pills[0].classList.add('active');
+            if (key === 'vis') pills[1].classList.add('active');
+            if (key === 'sklearn') pills[2].classList.add('active');
+            if (key === 'storage') pills[3].classList.add('active');
+            document.getElementById('code-display-1').innerHTML = codeRepo[key];
+        }
+
+        // ===== SLIDE 2: 清洗管道 ====
+        function updateDataVolume(targetNum, dropRate, desc, element) {
+            document.querySelectorAll('.pipe-node').forEach(n => n.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('volume-num').innerText = targetNum.toLocaleString();
+            document.getElementById('drop-rate').innerText = dropRate;
+            document.getElementById('pipe-desc').innerText = desc;
+            const percentage = (targetNum / 12615035) * 100;
+            document.getElementById('progress-fill').style.width = percentage + '%';
+        }
+
+        // ===== SLIDE 3: 每小时柱状图 ====
+        function initHourBars() {
+            const container = document.getElementById('hour-bar-container');
+            if (!container) return;
+            container.innerHTML = '';
+            const hourData = [
+                25, 18, 15, 20, 22, 50,
+                180, 420, 640, 580, 620, 680,
+                720, 660, 700, 750, 860, 1020,
+                900, 820, 580, 350, 200, 80
+            ];
+            const maxVal = Math.max(...hourData);
+            hourData.forEach((v, i) => {
+                const bar = document.createElement('div');
+                const h = (v / maxVal) * 100;
+                let color = '#3B82F6';
+                if (i >= 7 && i <= 8) color = '#60A5FA';
+                if (i >= 17 && i <= 18) color = '#F59E0B';
+                bar.style.cssText = `flex:1;height:${h}%;background:${color};border-radius:2px 2px 0 0;transition:height 0.6s ease;position:relative;cursor:pointer;`;
+                bar.title = `${i}:00 — ${v} 辆`;
+                bar.addEventListener('mouseenter', function() {
+                    this.style.background = '#8B5CF6';
+                    this.style.transform = 'scaleY(1.05)';
+                    this.style.transformOrigin = 'bottom';
+                });
+                bar.addEventListener('mouseleave', function() {
+                    this.style.background = color;
+                    this.style.transform = 'scaleY(1)';
+                });
+                if (v >= 900) {
+                    const label = document.createElement('span');
+                    label.textContent = v;
+                    label.style.cssText = 'position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:9px;color:#FBBF24;font-weight:700;';
+                    bar.appendChild(label);
+                }
+                container.appendChild(bar);
+            });
+        }
+
+        // ===== SLIDE 3: 速度热力图 ====
+        function initHeatmap() {
+            const grid = document.getElementById('heatmap-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            const speedByHour = [26.5, 27.0, 26.8, 26.2, 25.0, 24.0, 22.8, 22.0, 22.5, 24.0, 25.2, 25.8, 26.0, 25.5, 24.5, 23.0, 22.2, 21.8, 22.0, 23.5, 24.5, 25.5, 26.0, 26.5];
+            const colorScale = (v) => {
+                if (v >= 26) return 'rgba(16,185,129,0.8)';
+                if (v >= 24) return 'rgba(16,185,129,0.5)';
+                if (v >= 23) return 'rgba(245,158,11,0.6)';
+                return 'rgba(239,68,68,0.7)';
+            };
+
+            // 简化：显示6行 x 4列
+            for (let row = 0; row < 6; row++) {
+                for (let col = 0; col < 4; col++) {
+                    const hour = row * 4 + col;
+                    const cell = document.createElement('div');
+                    cell.className = 'heatmap-cell';
+                    cell.style.backgroundColor = colorScale(speedByHour[hour]);
+                    cell.textContent = `${speedByHour[hour]}`;
+                    cell.title = `${hour}:00 — ${speedByHour[hour]} m/s`;
+                    grid.appendChild(cell);
+                }
+            }
+        }
+
+        // ===== SLIDE 5: 异常率柱状图 ====
+        function initAnomalyBars() {
+            const container = document.getElementById('anomaly-bar-container');
+            if (!container) return;
+            container.innerHTML = '';
+            const anomalyRates = [
+                8, 6, 5, 7, 9, 12,
+                18, 24, 22, 20, 22, 24,
+                23, 21, 22, 25, 28, 35,
+                32, 28, 24, 20, 15, 10
+            ];
+            const maxVal = 40;
+            anomalyRates.forEach((v, i) => {
+                const bar = document.createElement('div');
+                const h = (v / maxVal) * 100;
+                let color = '#60A5FA';
+                if (v >= 30) color = '#EF4444';
+                else if (v >= 24) color = '#F59E0B';
+                bar.style.cssText = `flex:1;height:${h}%;background:${color};border-radius:2px 2px 0 0;transition:height 0.6s ease;cursor:pointer;`;
+                bar.title = `${i}:00 — ${v}%`;
+                bar.addEventListener('mouseenter', function() {
+                    this.style.background = '#8B5CF6';
+                    this.style.transform = 'scaleY(1.05)';
+                    this.style.transformOrigin = 'bottom';
+                });
+                bar.addEventListener('mouseleave', function() {
+                    this.style.background = color;
+                    this.style.transform = 'scaleY(1)';
+                });
+                container.appendChild(bar);
+            });
+        }
+
+        // ===== SLIDE 3: 随机刷新柱状图 ====
+        function randomizeBars() {
+            initHourBars();
+        }
+    </script>
+</body>
+</html>
