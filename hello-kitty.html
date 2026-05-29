@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hello Kitty 小站 🎀</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red:       #E8001A;
+    --red-deep:  #C20016;
+    --red-soft:  #FF4466;
+    --pink:      #FFB7C5;
+    --pink-mid:  #FF8FAA;
+    --pink-pale: #FFE4EE;
+    --pink-dust: #FFF0F4;
+    --white:     #FFFFFF;
+    --cream:     #FFF8FA;
+    --black:     #1A1A1A;
+    --text:      #3D1520;
+    --text-light:#9A6070;
+    --shadow:    0 6px 28px rgba(232,0,26,0.12);
+    --shadow-card: 0 4px 20px rgba(232,0,26,0.10);
+    --radius:    18px;
+    --bow-red:   #E8001A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background-color: var(--cream);
+    background-image:
+      radial-gradient(circle, rgba(232,0,26,0.12) 2px, transparent 2px),
+      radial-gradient(circle, rgba(255,183,197,0.18) 1.5px, transparent 1.5px);
+    background-size: 30px 30px, 15px 15px;
+    background-position: 0 0, 7.5px 7.5px;
+    min-height: 100vh;
+    color: var(--text);
+    padding-bottom: 50px;
+  }
+
+  /* === TOP STRIPE === */
+  .top-stripe {
+    height: 6px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--red) 0px, var(--red) 20px,
+      var(--white) 20px, var(--white) 30px,
+      var(--pink) 30px, var(--pink) 50px,
+      var(--white) 50px, var(--white) 60px
+    );
+  }
+
+  .container {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 0 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* === HERO === */
+  .hero {
+    text-align: center;
+    padding: 28px 0 8px;
+    position: relative;
+  }
+
+  /* SVG Hello Kitty face */
+  .kitty-wrap {
+    position: relative;
+    display: inline-block;
+    animation: kittyBounce 2.6s ease-in-out infinite;
+  }
+
+  @keyframes kittyBounce {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50% { transform: translateY(-10px) rotate(1deg); }
+  }
+
+  .kitty-shadow {
+    width: 90px;
+    height: 14px;
+    background: rgba(232,0,26,0.18);
+    border-radius: 50%;
+    margin: -6px auto 0;
+    filter: blur(5px);
+    animation: shadowPulse 2.6s ease-in-out infinite;
+  }
+
+  @keyframes shadowPulse {
+    0%, 100% { width: 90px; opacity: 0.5; }
+    50% { width: 70px; opacity: 0.25; }
+  }
+
+  .site-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 26px;
+    color: var(--red);
+    margin-top: 14px;
+    letter-spacing: 1px;
+    text-shadow: 1px 2px 0 rgba(232,0,26,0.15);
+  }
+
+  .site-subtitle {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 5px;
+    letter-spacing: 1px;
+  }
+
+  /* Bow divider */
+  .bow-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .bow-line {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--pink), var(--red), var(--pink), transparent);
+    border-radius: 1px;
+  }
+
+  /* CSS Bow shape */
+  .bow-shape {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+  }
+
+  .bow-left, .bow-right {
+    width: 12px;
+    height: 10px;
+    background: var(--red);
+    border-radius: 50% 0 0 50%;
+    position: relative;
+  }
+
+  .bow-right { border-radius: 0 50% 50% 0; }
+
+  .bow-knot {
+    width: 7px;
+    height: 7px;
+    background: var(--red-deep);
+    border-radius: 50%;
+    z-index: 1;
+  }
+
+  /* === CARD === */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 18px 18px 16px;
+    margin-top: 14px;
+    box-shadow: var(--shadow-card);
+    border: 2px solid var(--pink-pale);
+    position: relative;
+    overflow: hidden;
+    animation: cardIn 0.45s cubic-bezier(.34,1.56,.64,1) both;
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(18px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .card:nth-child(2) { animation-delay: 0.08s; }
+  .card:nth-child(3) { animation-delay: 0.16s; }
+  .card:nth-child(4) { animation-delay: 0.24s; }
+  .card:nth-child(5) { animation-delay: 0.32s; }
+
+  /* Card corner bow decoration */
+  .card::before {
+    content: '🎀';
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 14px;
+    opacity: 0.35;
+  }
+
+  /* Card top-left red accent bar */
+  .card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--red), var(--pink));
+    border-radius: 18px 0 0 18px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .card-icon { font-size: 20px; }
+
+  .card-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 16px;
+    color: var(--red);
+    letter-spacing: 0.5px;
+  }
+
+  /* === WEATHER === */
+  .weather-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+  }
+
+  .weather-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 8px 3px;
+    border-radius: 12px;
+    background: var(--pink-dust);
+    border: 1.5px solid transparent;
+    font-size: 11px;
+    transition: all 0.2s;
+    cursor: default;
+  }
+
+  .weather-day.today {
+    background: linear-gradient(160deg, var(--red), var(--red-soft));
+    border-color: var(--red);
+    box-shadow: 0 4px 14px rgba(232,0,26,0.3);
+  }
+
+  .weather-day.today .day-name,
+  .weather-day.today .temp,
+  .weather-day.today .temp-low { color: white !important; }
+
+  .weather-day:hover { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(232,0,26,0.15); }
+
+  .weather-day .day-name  { color: var(--text-light); font-size: 10px; }
+  .weather-day .weather-emoji { font-size: 17px; }
+  .weather-day .temp      { color: var(--text); font-weight: 700; font-size: 11px; }
+  .weather-day .temp-low  { color: var(--text-light); font-size: 10px; }
+
+  .weather-loading {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 13px;
+    padding: 12px 0;
+  }
+
+  .weather-error {
+    text-align: center;
+    color: var(--red);
+    font-size: 13px;
+    padding: 12px 0;
+  }
+
+  /* === HOROSCOPE === */
+  .horoscope-card {
+    background: linear-gradient(160deg, #fff5f7, #fff0f9);
+    border-color: var(--pink);
+  }
+
+  .horoscope-sign { text-align: center; margin-bottom: 12px; }
+  .sign-emoji { font-size: 38px; display: block; margin-bottom: 4px; }
+
+  .horoscope-text {
+    background: rgba(255,183,197,0.2);
+    border: 1.5px solid rgba(255,183,197,0.5);
+    border-radius: 14px;
+    padding: 13px 15px;
+    font-size: 13px;
+    line-height: 1.85;
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 13px;
+  }
+
+  .horoscope-tags {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+  }
+
+  .horoscope-tag {
+    padding: 8px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 600;
+  }
+
+  .tag-lucky-num   { background: rgba(255,183,197,0.25); color: var(--red-deep); border: 1px solid rgba(232,0,26,0.15); }
+  .tag-lucky-color { background: rgba(255,144,170,0.18); color: #c0005a; border: 1px solid rgba(255,144,170,0.3); }
+  .tag-mood        { background: rgba(232,0,26,0.07);    color: var(--red);      border: 1px solid rgba(232,0,26,0.12); }
+  .tag-time        { background: rgba(255,228,238,0.6);   color: #9a0030;         border: 1px solid rgba(255,183,197,0.4); }
+
+  /* === TODO === */
+  .todo-empty {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 13px;
+    padding: 18px 0 10px;
+  }
+
+  .category-tabs { display: flex; gap: 7px; margin-bottom: 13px; flex-wrap: wrap; }
+
+  .cat-btn {
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1.5px solid var(--pink);
+    background: var(--white);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.18s;
+    font-family: 'Noto Sans SC', sans-serif;
+    color: var(--text);
+  }
+
+  .cat-btn:hover { background: var(--pink-pale); }
+
+  .cat-btn.active {
+    background: var(--red);
+    border-color: var(--red);
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 3px 10px rgba(232,0,26,0.28);
+  }
+
+  .todo-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 13px; }
+
+  .todo-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 13px;
+    background: var(--pink-dust);
+    border: 1.5px solid rgba(255,183,197,0.4);
+    border-radius: 12px;
+    font-size: 13px;
+    animation: popIn 0.25s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.88); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .todo-check {
+    width: 19px; height: 19px;
+    border-radius: 50%;
+    border: 2.5px solid var(--pink-mid);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 11px;
+    transition: all 0.2s;
+    color: white;
+    background: transparent;
+  }
+
+  .todo-check.done { background: var(--red); border-color: var(--red); }
+
+  .todo-text      { flex: 1; }
+  .todo-text.done { text-decoration: line-through; color: var(--text-light); }
+
+  .todo-cat-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background: rgba(232,0,26,0.1);
+    color: var(--red);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .todo-del {
+    background: none; border: none;
+    cursor: pointer; font-size: 13px;
+    color: var(--pink-mid); opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .todo-del:hover { opacity: 1; color: var(--red); }
+
+  .todo-input-row { display: flex; gap: 8px; align-items: center; }
+
+  .todo-input {
+    flex: 1;
+    padding: 10px 15px;
+    border-radius: 20px;
+    border: 2px solid var(--pink);
+    background: var(--white);
+    font-size: 13px;
+    font-family: 'Noto Sans SC', sans-serif;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .todo-input:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(232,0,26,0.1);
+  }
+
+  .todo-input::placeholder { color: var(--text-light); }
+
+  .add-btn {
+    padding: 10px 18px;
+    border-radius: 20px;
+    border: none;
+    background: linear-gradient(135deg, var(--red), var(--red-soft));
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans SC', sans-serif;
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(232,0,26,0.35);
+    white-space: nowrap;
+  }
+
+  .add-btn:hover  { transform: scale(1.05); box-shadow: 0 6px 18px rgba(232,0,26,0.45); }
+  .add-btn:active { transform: scale(0.97); }
+
+  /* === GREETING === */
+  .greeting-card {
+    background: linear-gradient(160deg, var(--red), var(--red-soft), var(--pink-mid));
+    border-color: var(--red);
+    text-align: center;
+  }
+
+  .greeting-card::before { content: '🎀'; opacity: 0.5; }
+  .greeting-card::after  { background: linear-gradient(180deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1)); }
+  .greeting-card .card-title { color: white; }
+
+  .greeting-inner { padding: 6px 0 4px; }
+
+  .greeting-emoji {
+    font-size: 42px;
+    display: block;
+    margin-bottom: 8px;
+    animation: greetingGlow 3s ease-in-out infinite;
+  }
+
+  @keyframes greetingGlow {
+    0%, 100% { filter: drop-shadow(0 0 6px rgba(255,220,100,0.6)); }
+    50% { filter: drop-shadow(0 0 18px rgba(255,220,100,1)); }
+  }
+
+  .greeting-text {
+    font-size: 16px;
+    color: white;
+    font-weight: 700;
+    font-family: 'Fredoka One', cursive;
+    letter-spacing: 0.5px;
+  }
+
+  .greeting-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+    margin-top: 6px;
+  }
+
+  /* === FLOATING DECO === */
+  .float-deco {
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+    font-size: 22px;
+    opacity: 0.13;
+    animation: drift 18s linear infinite;
+  }
+
+  @keyframes drift {
+    0%   { transform: translate(0,0) rotate(0deg); }
+    33%  { transform: translate(20px,-15px) rotate(120deg); }
+    66%  { transform: translate(-10px,12px) rotate(240deg); }
+    100% { transform: translate(0,0) rotate(360deg); }
+  }
+
+  /* === FOOTER === */
+  .footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 11px;
+    color: var(--text-light);
+    padding-bottom: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  /* === SCROLLBAR === */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--pink-dust); }
+  ::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--red); }
+</style>
+</head>
+<body>
+
+<div class="top-stripe"></div>
+
+<!-- Floating decorations -->
+<div class="float-deco" style="top:8%;left:4%;animation-delay:0s">🎀</div>
+<div class="float-deco" style="top:35%;right:3%;animation-delay:-6s">🌸</div>
+<div class="float-deco" style="top:65%;left:5%;animation-delay:-12s">💗</div>
+<div class="float-deco" style="top:85%;right:6%;animation-delay:-4s">🎀</div>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="kitty-wrap">
+      <!-- Hello Kitty SVG face -->
+      <svg width="130" height="130" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Drop shadow circle -->
+        <ellipse cx="65" cy="122" rx="36" ry="7" fill="rgba(232,0,26,0.15)"/>
+        <!-- Head -->
+        <circle cx="65" cy="66" r="50" fill="white" stroke="#FFCDD8" stroke-width="2"/>
+        <!-- Left ear -->
+        <ellipse cx="32" cy="28" rx="14" ry="16" fill="white" stroke="#FFCDD8" stroke-width="2"/>
+        <!-- Right ear -->
+        <ellipse cx="98" cy="28" rx="14" ry="16" fill="white" stroke="#FFCDD8" stroke-width="2"/>
+        <!-- Ear inner left -->
+        <ellipse cx="32" cy="30" rx="7" ry="9" fill="#FFD6E0"/>
+        <!-- Ear inner right -->
+        <ellipse cx="98" cy="30" rx="7" ry="9" fill="#FFD6E0"/>
+        <!-- BOW on right ear - left wing -->
+        <ellipse cx="90" cy="14" rx="10" ry="7" fill="#E8001A" transform="rotate(-20 90 14)"/>
+        <!-- BOW on right ear - right wing -->
+        <ellipse cx="110" cy="10" rx="10" ry="7" fill="#E8001A" transform="rotate(20 110 10)"/>
+        <!-- BOW knot -->
+        <circle cx="100" cy="12" r="5" fill="#C20016"/>
+        <!-- BOW tail left -->
+        <path d="M97 16 Q93 22 90 20" stroke="#E8001A" stroke-width="3" stroke-linecap="round"/>
+        <!-- BOW tail right -->
+        <path d="M103 16 Q107 22 110 20" stroke="#E8001A" stroke-width="3" stroke-linecap="round"/>
+        <!-- Eyes -->
+        <ellipse cx="50" cy="64" rx="5" ry="6" fill="#1A1A1A"/>
+        <ellipse cx="80" cy="64" rx="5" ry="6" fill="#1A1A1A"/>
+        <!-- Eye shine -->
+        <circle cx="52" cy="61" r="2" fill="white"/>
+        <circle cx="82" cy="61" r="2" fill="white"/>
+        <!-- Nose (yellow oval) -->
+        <ellipse cx="65" cy="76" rx="5" ry="4" fill="#FFD700"/>
+        <!-- Whiskers left -->
+        <line x1="18" y1="72" x2="54" y2="74" stroke="#ccc" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="18" y1="80" x2="54" y2="78" stroke="#ccc" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Whiskers right -->
+        <line x1="76" y1="74" x2="112" y2="72" stroke="#ccc" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="76" y1="78" x2="112" y2="80" stroke="#ccc" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Cheek blush -->
+        <ellipse cx="40" cy="82" rx="10" ry="6" fill="rgba(255,160,180,0.35)"/>
+        <ellipse cx="90" cy="82" rx="10" ry="6" fill="rgba(255,160,180,0.35)"/>
+      </svg>
+    </div>
+    <div class="kitty-shadow"></div>
+
+    <h1 class="site-title">🎀 Hello Kitty 小站</h1>
+    <p class="site-subtitle">用心记录美好每一天 ♡</p>
+
+    <div class="bow-divider">
+      <div class="bow-line"></div>
+      <div class="bow-shape">
+        <div class="bow-left"></div>
+        <div class="bow-knot"></div>
+        <div class="bow-right"></div>
+      </div>
+      <div class="bow-line"></div>
+    </div>
+  </div>
+
+  <!-- WEATHER -->
+  <div class="card" id="weatherCard">
+    <div class="card-header">
+      <span class="card-icon">🌸</span>
+      <span class="card-title">赣州 · 章贡区 一周天气</span>
+    </div>
+    <div id="weatherContent"><div class="weather-loading">⏳ 获取天气数据中...</div></div>
+  </div>
+
+  <!-- HOROSCOPE -->
+  <div class="card horoscope-card" id="horoscopeCard">
+    <div class="card-header">
+      <span class="card-icon">✨</span>
+      <span class="card-title">今日星座运势 · 天蝎座</span>
+    </div>
+    <div id="horoscopeContent"></div>
+  </div>
+
+  <!-- TODO -->
+  <div class="card" id="todoCard">
+    <div class="card-header">
+      <span class="card-icon">🎀</span>
+      <span class="card-title">今日待办</span>
+    </div>
+    <div class="category-tabs">
+      <button class="cat-btn active" data-cat="study" onclick="selectCat(this)">📚 学习</button>
+      <button class="cat-btn" data-cat="life" onclick="selectCat(this)">🏠 生活</button>
+      <button class="cat-btn" data-cat="fun" onclick="selectCat(this)">🎮 娱乐</button>
+      <button class="cat-btn" data-cat="important" onclick="selectCat(this)">⭐ 重要</button>
+    </div>
+    <div id="todoList" class="todo-list"></div>
+    <div class="todo-input-row">
+      <input class="todo-input" id="todoInput" placeholder="添加今天的待办事项..."
+             onkeydown="if(event.key==='Enter')addTodo()">
+      <button class="add-btn" onclick="addTodo()">添加</button>
+    </div>
+  </div>
+
+  <!-- GREETING -->
+  <div class="card greeting-card" id="greetingCard">
+    <div class="greeting-inner">
+      <span class="greeting-emoji" id="greetingEmoji">🌙</span>
+      <div class="greeting-text" id="greetingText">晚上好！回顾一下今天吧～</div>
+      <div class="greeting-sub" id="greetingSub">记录美好，Hello Kitty 陪着你 🎀</div>
+    </div>
+  </div>
+
+  <div class="footer">🎀 Hello Kitty 小站 · 用爱制作 ♡</div>
+</div>
+
+<script>
+// ===== WEATHER (真实 API: Open-Meteo) =====
+// 赣州 章贡区 坐标
+const WEATHER_LAT = 25.86;
+const WEATHER_LON = 114.93;
+const DAY_NAMES = ['周日','周一','周二','周三','周四','周五','周六'];
+
+function wmoToEmoji(code) {
+  if (code === 0) return '☀️';
+  if (code === 1) return '🌤';
+  if (code === 2) return '⛅';
+  if (code === 3) return '☁️';
+  if (code >= 45 && code <= 48) return '🌫';
+  if (code >= 51 && code <= 57) return '🌦';
+  if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) return '🌧';
+  if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) return '🌨';
+  if (code >= 95) return '⛈';
+  return '🌤';
+}
+
+async function fetchWeather() {
+  const el = document.getElementById('weatherContent');
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${WEATHER_LAT}&longitude=${WEATHER_LON}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Asia%2FShanghai`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('API 请求失败');
+    const data = await res.json();
+    const daily = data.daily;
+    const today = new Date();
+    const dayIndex = today.getDay();
+
+    const html = '<div class="weather-grid">' +
+      daily.time.map((date, i) => {
+        const d = new Date(date + 'T12:00:00');
+        const dayLabel = i === 0 ? '今天' : i === 1 ? '明天' : DAY_NAMES[d.getDay()];
+        const emoji = wmoToEmoji(daily.weathercode[i]);
+        const high = Math.round(daily.temperature_2m_max[i]);
+        const low = Math.round(daily.temperature_2m_min[i]);
+        return `<div class="weather-day ${i===0?'today':''}">
+          <span class="day-name">${dayLabel}</span>
+          <span class="weather-emoji">${emoji}</span>
+          <span class="temp">${high}°</span>
+          <span class="temp-low">${low}°</span>
+        </div>`;
+      }).join('') +
+      '</div>';
+    el.innerHTML = html;
+  } catch (e) {
+    el.innerHTML = `<div class="weather-error">😿 天气数据获取失败，请稍后重试</div>`;
+    console.warn('Weather fetch error:', e);
+  }
+}
+
+// ===== HOROSCOPE (每日运势 · 仅天蝎座) =====
+const SIGN = { name:'天蝎座', emoji:'♏' };
+const HORO_CACHE_KEY = 'hkHoroCache';
+
+// 每日基于日期生成，无需 API
+function generateDailyHoroscope() {
+  const today = new Date();
+  const dateStr = today.toISOString().split('T')[0];
+  const cached = JSON.parse(localStorage.getItem(HORO_CACHE_KEY) || '{}');
+
+  if (cached.date === dateStr) {
+    renderHoroscope(cached);
+    return;
+  }
+
+  // 日期种子 —— 同一天相同
+  const seed = parseInt(dateStr.replace(/-/g, ''), 10);
+  let s = seed;
+  const r = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+  const ri = (max) => Math.floor(r() * max);
+
+  const openings = [
+    '今天天蝎座的直觉格外敏锐，', '这是充满洞察力的一天，', '你的内心力量在今天特别强大，',
+    '天蝎座今日能量场极佳，', '今天你会发现自己看问题格外透彻，', '星辰排列对你有利，',
+    '一股深邃的力量在今天涌动，', '今天的你比平时更敏锐，',
+  ];
+  const bodies = [
+    '工作中隐藏的机会将被你一眼看穿。', '人际关系中适合进行深度对话，收获真心。',
+    '适合深入研究一个长期困扰你的问题。', '财务方面独具慧眼，能发现被忽略的价值。',
+    '学习新事物的效率出奇地高，抓住灵感。', '适合独处思考，会有重要的顿悟时刻。',
+    '团队中你的判断力令人信服，自然成为核心。', '过往的努力将在今天显现成果。',
+  ];
+  const endings = [
+    '保持自信，你会看到不一样的风景。', '跟随直觉，今天的每一个决定都值得信任。',
+    '别忘了对自己温柔一点，你做得很好。', '把精力放在最重要的事上，效果加倍。',
+    '留意身边的小细节，惊喜藏在那里。', '坚持自己的节奏，今天适合稳步前进。',
+  ];
+  const colors = ['深海蓝','暗夜紫','酒红色','墨绿色','石墨灰','藏青色','咖啡棕','暗金色','玫瑰红','烟灰色','宝石蓝','青铜色','樱桃红','森林绿'];
+  const moods = ['深邃专注','冷静敏锐','自信坚定','神秘优雅','沉稳有力','直觉爆棚','清醒通透','内敛强大'];
+  const times = ['上午7点','上午9点','上午11点','中午12点','下午2点','下午4点','下午6点','晚上8点','晚上10点'];
+
+  const n1 = ri(openings.length);
+  let n2 = ri(bodies.length);
+  while (n2 === n1) n2 = ri(bodies.length);
+  const n3 = ri(endings.length);
+
+  const text = openings[n1] + bodies[n2] + endings[n3];
+  const num = ri(12) + 1;
+  const color = colors[ri(colors.length)];
+  const mood = moods[ri(moods.length)];
+  const time = times[ri(times.length)];
+
+  const result = { date: dateStr, text, num, color, mood, time };
+  localStorage.setItem(HORO_CACHE_KEY, JSON.stringify(result));
+  renderHoroscope(result);
+}
+
+function renderHoroscope(d) {
+  document.getElementById('horoscopeContent').innerHTML = `
+    <div class="horoscope-sign"><span class="sign-emoji">${SIGN.emoji}</span></div>
+    <div class="horoscope-text">${d.text}</div>
+    <div class="horoscope-tags">
+      <div class="horoscope-tag tag-lucky-num">🍀 幸运数字 ${d.num}</div>
+      <div class="horoscope-tag tag-lucky-color">🎨 幸运色 ${d.color}</div>
+      <div class="horoscope-tag tag-mood">💗 ${d.mood}</div>
+      <div class="horoscope-tag tag-time">⏰ 黄金时间 ${d.time}</div>
+    </div>`;
+}
+
+// ===== TODO =====
+let todos = JSON.parse(localStorage.getItem('hkTodos') || '[]');
+let selectedCat = 'study';
+
+const catLabels = { study:'📚 学习', life:'🏠 生活', fun:'🎮 娱乐', important:'⭐ 重要' };
+
+function saveTodos() { localStorage.setItem('hkTodos', JSON.stringify(todos)); }
+
+function selectCat(btn) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedCat = btn.dataset.cat;
+}
+
+function addTodo() {
+  const input = document.getElementById('todoInput');
+  const text = input.value.trim();
+  if (!text) return;
+  todos.push({ id: Date.now(), text, cat: selectedCat, done: false });
+  saveTodos(); renderTodos(); input.value = '';
+}
+
+function toggleTodo(id) {
+  todos = todos.map(t => t.id===id ? {...t, done:!t.done} : t);
+  saveTodos(); renderTodos();
+}
+
+function deleteTodo(id) {
+  todos = todos.filter(t => t.id !== id);
+  saveTodos(); renderTodos();
+}
+
+function renderTodos() {
+  const list = document.getElementById('todoList');
+  if (!todos.length) {
+    list.innerHTML = `<div class="todo-empty">还没有待办事项～ 🎀</div>`; return;
+  }
+  list.innerHTML = todos.map(t => `
+    <div class="todo-item">
+      <div class="todo-check ${t.done?'done':''}" onclick="toggleTodo(${t.id})">${t.done?'✓':''}</div>
+      <span class="todo-text ${t.done?'done':''}">${t.text}</span>
+      <span class="todo-cat-badge">${catLabels[t.cat]}</span>
+      <button class="todo-del" onclick="deleteTodo(${t.id})">✕</button>
+    </div>`).join('');
+}
+
+// ===== GREETING =====
+function renderGreeting() {
+  const h = new Date().getHours();
+  let [emoji, text, sub] = h >= 5 && h < 12
+    ? ['🌅','早上好！元气满满的一天开始啦～','Hello Kitty 祝你今天超棒 🎀']
+    : h < 14
+    ? ['☀️','中午好！记得好好吃饭补充能量哦～','下午也要加油！Hello Kitty 支持你 💗']
+    : h < 18
+    ? ['🌤','下午好！保持专注，你超厉害的！','离目标又近了一步 🎀']
+    : h < 22
+    ? ['🌙','晚上好！回顾一下今天吧～','添加一条待办，Hello Kitty 帮你记住 🎀']
+    : ['🌛','夜深了，早点休息哦～','明天又是元气满满的一天 💗'];
+  document.getElementById('greetingEmoji').textContent = emoji;
+  document.getElementById('greetingText').textContent = text;
+  document.getElementById('greetingSub').textContent = sub;
+}
+
+// ===== INIT =====
+fetchWeather();
+generateDailyHoroscope();
+renderTodos();
+renderGreeting();
+</script>
+</body>
+</html>
